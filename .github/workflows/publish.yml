@@ -1,0 +1,40 @@
+on:
+  workflow_dispatch:
+    inputs:
+      package_version:
+        description: 'Package version to be published to NPM. Defaults to current version of boring-avatars.'
+        required: false
+      dist_tag:
+        description: 'What dist tag should be used for publishing (e.g. `next` vs `latest`). Defaults to `next`.'
+        required: true
+        default: next
+
+name: Publish
+
+jobs:
+  prebuild-node:
+    name: Publish package to npm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+
+      - uses: actions/checkout@v3
+
+        # We're changing got package.json here and republishing it as a ESM module under the name boring-avatars-esm.
+      - name: Build ESM
+        run: node build.mjs
+
+      - name: Set version if provided
+        if: ${{ github.event.inputs.package_version != null }}
+        run: >
+          jq '.version = "${{github.event.inputs.package_version}}"' boring-avatars/package.json > boring-avatars/temp-package.json
+          && rm boring-avatars/package.json && mv boring-avatars/temp-package.json boring-avatars/package.json
+
+      - name: Publish to NPM
+        run: npm publish boring-avatars
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
