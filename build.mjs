@@ -10,7 +10,7 @@ execSync('git clone https://github.com/boringdesigners/boring-avatars', { stdio:
     const packageJson = JSON.parse(readFileSync('boring-avatars/package.json'));
 
     packageJson.name = 'boring-avatars-esm';
-    packageJson.repository = 'boring-avatars-esm';
+    packageJson.repository = 'https://github.com/lu-zen/boring-avatars-esm';
     packageJson.type = 'module';
     delete packageJson.main;
 
