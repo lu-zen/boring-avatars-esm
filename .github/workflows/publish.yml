@@ -5,9 +5,9 @@ on:
         description: 'Package version to be published to NPM. Defaults to current version of boring-avatars.'
         required: false
       dist_tag:
-        description: 'What dist tag should be used for publishing (e.g. `next` vs `latest`). Defaults to `next`.'
+        description: 'What dist tag should be used for publishing (e.g. `next` vs `latest`). Defaults to `latest`.'
         required: true
-        default: next
+        default: latest
 
 name: Publish
 
@@ -16,10 +16,10 @@ jobs:
     name: Publish package to npm
     runs-on: ubuntu-latest
     steps:
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           registry-url: https://registry.npmjs.org/
 
       - uses: actions/checkout@v3
@@ -35,6 +35,6 @@ jobs:
           && rm boring-avatars/package.json && mv boring-avatars/temp-package.json boring-avatars/package.json
 
       - name: Publish to NPM
-        run: npm publish boring-avatars
+        run: npm publish boring-avatars/
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
